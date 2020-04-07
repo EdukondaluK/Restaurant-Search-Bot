@@ -1,4 +1,4 @@
-## functions to call zomato api for finding the restaurants
+## functions to call zomato api for searching the restaurants
 # get the API key from https://developers.zomato.com/documentation#/
 import requests
 import json
