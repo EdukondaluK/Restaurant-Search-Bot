@@ -31,5 +31,5 @@ Check out the demo @ https://youtu.be/j1BvTwNZKLY
   
   
   
-  > **Note**: *this bot was specifically designed to support custom UI*
+ **Note**: *this bot was specifically designed to support custom UI*
   
