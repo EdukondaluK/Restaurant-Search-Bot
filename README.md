@@ -12,7 +12,7 @@ Check out the demo @ https://youtu.be/j1BvTwNZKLY
 - User can search restaurants 
 
 ## Rasa Components Used
-- [Transformer Embedding Dialogue Policy (TEDP)](https://rasa.com/docs/rasa/core/policies/#embedding-policy)
+- [Transformer Embedding Dialogue Policy (TEDP)](https://rasa.com/docs/rasa/core/policies/#ted-policy)
 - [Retrieval Actions](https://rasa.com/docs/rasa/core/retrieval-actions/#retrieval-actions)
 
 ## Prerequisites
