@@ -29,7 +29,7 @@ slots:
     type: unfeaturized
   longitude:
     type: unfeaturized
-templates:
+responses:
   utter_greet_user:
   - text: Hello Foodie! I am here to help you find restaurants. How may I  help you today? 😃
   utter_ask_cuisine:
@@ -84,3 +84,6 @@ actions:
 - action_search_restaurants_without_cuisine
 - action_search_best_restaurants
 - action_greet_user
+session_config:
+  session_expiration_time: 480  # value in minutes, 0 means infinitely long
+  carry_over_slots_to_new_session: true  # set to false to forget slots between sessions

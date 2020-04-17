@@ -67,8 +67,8 @@ class ActionSearchRestaurants(Action):
         if(user_locationEntity or (latEntity and lonEntity) ):
             ##check if we already have the user location coordinates stoed in slots
             if(lat==None and lon==None):
-                dispatcher.utter_message("Sure, please allow me to access your location 🧐")
-                dispatcher.utter_custom_json({"payload":"location"})
+                dispatcher.utter_message(text="Sure, please allow me to access your location 🧐",json_message={"payload":"location"})
+                
                 return []
             else:
                 locationEntities=zomatoApi.getLocationDetailsbyCoordinates(lat,lon)
@@ -110,8 +110,8 @@ class ActionSearchRestaurants(Action):
 
             ## check if restaurants found
             if(len(restaurants)>0):
-                dispatcher.utter_message("Here are the few restaurants that matches your preferences 😋")
-                dispatcher.utter_custom_json({"payload":"cardsCarousel","data":restaurants})
+                dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants})
+                
                 return []
                 
             dispatcher.utter_message("Sorry we couldn't find any restaurants that serves {} cuisine in {} 😞".format(cuisine,location))
@@ -159,8 +159,8 @@ class ActionSearchBestRestaurants(Action):
         if(user_locationEntity or (latEntity and lonEntity) ):
             ##check if we already have the user location coordinates stoed in slots
             if(lat==None and lon==None):
-                dispatcher.utter_message("Sure, please allow me to access your location 🧐")
-                dispatcher.utter_custom_json({"payload":"location"})
+                dispatcher.utter_message(text="Sure, please allow me to access your location 🧐",json_message={"payload":"location"})
+              
                 return []
             else:
                 locationEntities=zomatoApi.getLocationDetailsbyCoordinates(lat,lon)
@@ -189,11 +189,11 @@ class ActionSearchBestRestaurants(Action):
         
         ## check if restaurants details found
         if(len(restaurants)>0):
-                dispatcher.utter_message("Here are few top rated restaurants that I have found 🤩")
-                dispatcher.utter_custom_json({"payload":"cardsCarousel","data":restaurants["best_restaurants"]})
+                dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message={"payload":"cardsCarousel","data":restaurants["best_restaurants"]})
+               
                 return []
-                
-        dispatcher.utter_message("Sorry we couldn't find any best restaurants ☹️".format(cuisine,location))
+        
+        dispatcher.utter_message("Sorry we couldn't find any best restaurants ☹️")
         return [UserUtteranceReverted()]
         
 
@@ -227,8 +227,8 @@ class ActionSearchRestaurantsWithoutCuisine(Action):
         ##set the cuisine to any of the cuisine name or you leave it empyt
         cuisine_id=""
         restaurants=zomatoApi.searchRestaurants(entity_id,entity_type, cuisine_id,"")
-        dispatcher.utter_message("Here are the few restaurants I have found 😋!!!")
-        dispatcher.utter_custom_json({"payload":"cardsCarousel","data":restaurants})
+        dispatcher.utter_message(text="Here are the few restaurants I have found 😋!!!",json_message={"payload":"cardsCarousel","data":restaurants})
+        
 
 class ActionAskCuisine(Action):
     """
@@ -271,8 +271,8 @@ class ActionAskCuisine(Action):
 
         if(user_locationEntity or (latEntity and lonEntity) ):
             if(lat==None and lon==None):
-                dispatcher.utter_message("Sure, please allow me to access your location 🧐")
-                dispatcher.utter_custom_json({"payload":"location"})
+                dispatcher.utter_message(text="Sure, please allow me to access your location 🧐",json_message={"payload":"location"})
+                
                 return []
             else:
                 locationEntities=zomatoApi.getLocationDetailsbyCoordinates(lat,lon)
@@ -307,7 +307,7 @@ class ActionAskCuisine(Action):
             locationDetails=zomatoApi.getLocationDetails(locationEntities["entity_id"],locationEntities["entity_type"])
 
             dispatcher.utter_template("utter_ask_cuisine", tracker)
-            dispatcher.utter_custom_json({"payload":"quickReplies","data":locationDetails["top_cuisines"]})
+            dispatcher.utter_message(json_message={"payload":"quickReplies","data":locationDetails["top_cuisines"]})
         
             return [SlotSet("city_id", locationEntities["city_id"]),SlotSet("location_id", locationEntities["entity_id"]),SlotSet("location_type", locationEntities["entity_type"])]
 
