@@ -36,5 +36,6 @@ Check out the demo @ https://youtu.be/j1BvTwNZKLY
   
   
   
- **Note**: *this bot was specifically designed to work with [Chatbot Widget](https://github.com/JiteshGaikwad/Chatbot-Widget)*
+ **Note**: *While developing this bot, I had used Rasa v.1.9.7 and there was some issue with the slack connector of Rasa, I have found a temporary fix, I have mentioned this in the [issue](https://github.com/RasaHQ/rasa/issues/5704). If you want to use the UI which you see in the above screens, you check the [chatbot widget](https://github.com/JiteshGaikwad/Chatbot-Widget)*
+
   
