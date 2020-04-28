@@ -17,7 +17,7 @@ Check out the demo @ https://youtu.be/j1BvTwNZKLY
 
 
 ## Rasa Components Used
-- [Transformer Embedding Dialogue Policy (TEDP)](https://rasa.com/docs/rasa/core/policies/#embedding-policy)
+- [Transformer Embedding Dialogue Policy (TEDP)](https://rasa.com/docs/rasa/core/policies/#ted-policy)
 - [Retrieval Actions](https://rasa.com/docs/rasa/core/retrieval-actions/#retrieval-actions)
 - [DIET Classifier](https://rasa.com/docs/rasa/nlu/components/#dietclassifier)
 
@@ -37,5 +37,5 @@ Check out the demo @ https://youtu.be/j1BvTwNZKLY
   
   
   
-  > **Note**: *this bot was specifically designed to support custom UI*
+ **Note**: *this bot was specifically designed to work with [Chatbot Widget](https://github.com/JiteshGaikwad/Chatbot-Widget)*
   
