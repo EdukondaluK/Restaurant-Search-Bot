@@ -7,8 +7,9 @@ Restaurants Search Bot using Rasa Framework &amp; Zomato API
 ![ScreenShot](./Slack_1.PNG) ![ScreenShot](./Slack_2.PNG)
 
 ## Demo
-Check out the demo @ https://youtu.be/j1BvTwNZKLY
-
+Check out the demo
+- using [slack ](https://youtu.be/6Dl_kpkU8tc)
+- using [chatbot widget](https://youtu.be/j1BvTwNZKLY)
 ## Features
 - User can search top-rated restaurants
 - User can search restaurants using location and cuisine
