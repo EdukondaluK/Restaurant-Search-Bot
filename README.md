@@ -2,10 +2,9 @@
 Restaurants Search Bot using Rasa Framework &amp; Zomato API
 
 ## Screens
-![ScreenShot](./ui_1.PNG) ![ScreenShot](./ui_2.PNG) ![ScreenShot](./ui_3.png)
+![ScreenShot](./ui_1.PNG) ![ScreenShot](./ui_2.PNG) !
 
-![ScreenShot](./Slack_1.PNG)
-![ScreenShot](./Slack_2.PNG)
+![ScreenShot](./Slack_1.PNG) ![ScreenShot](./Slack_2.PNG)
 
 ## Demo
 Check out the demo @ https://youtu.be/j1BvTwNZKLY
