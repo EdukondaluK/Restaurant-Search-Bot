@@ -1,2 +1,5 @@
-# ignore the models folder
+# ignore the folder
 models/
+__pycache__
+events.db
+rasa.db

@@ -7,6 +7,7 @@ intents:
 - searchBestRestaurants
 - changeLocation
 - changeCuisine
+- show_more
 - chitchat
 entities:
 - user_location
@@ -28,6 +29,8 @@ slots:
   location_type:
     type: unfeaturized
   longitude:
+    type: unfeaturized
+  more_restaurants:
     type: unfeaturized
 responses:
   utter_greet_user:
@@ -84,6 +87,7 @@ actions:
 - action_search_restaurants_without_cuisine
 - action_search_best_restaurants
 - action_greet_user
+- action_show_more_results
 session_config:
   session_expiration_time: 480  # value in minutes, 0 means infinitely long
   carry_over_slots_to_new_session: true  # set to false to forget slots between sessions

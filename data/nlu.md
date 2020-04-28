@@ -5,9 +5,9 @@
 - change the cuisine to [Maharashtrian](cuisine)
 - change the cuisine to [south indian](cuisine)
 - change the cuisine to [North Eastern](cuisine)
-- can you change the cusine to [punjabi](cuisine)
-- can you change the cusine to [japanese](cuisine)
-- can you change the cusine to [japanese](cuisine)
+- can you change the cuisine to [punjabi](cuisine)
+- can you change the cuisine to [japanese](cuisine)
+- can you change the cuisine to [japanese](cuisine)
 - please change the cuisine to [thai](cuisine)
 - please change the cuisine to [European](cuisine)
 - please change the cuisine to [BBQ](cuisine)
@@ -193,6 +193,7 @@
 - [north indian](cuisine)
 - [Lebanese](cuisine)
 - [Fusion](cuisine)
+- [Coffee and Tea](cuisine)
 - [Caribbean](cuisine)
 - [cajuan](cuisine)
 - [Polish](cuisine)
@@ -350,11 +351,13 @@
 - are there any restaurants [nearby](user_location) that serves some [south indian](cuisine) food
 - I am searching for some [bengali](cuisine) food
 - I am searching for some [Brazilian](cuisine) food
+- I am searching for some [Coffee and Tea](cuisine)
 - I am searching for some [Modern Indian](cuisine) food
 - I am searching for some [Mongolian](cuisine) food
 - I am searching for some [Chettinad](cuisine) food
 - I am searching for some [Hyderabadi](cuisine) food near [thane](location)
 - I am searching for some [Asian](cuisine) food near [thrissur](location)
+- I am searching for some [Asian](cuisine) food near [berlin](location)
 - I am searching for some [Chettinad](cuisine) food near [kanpur](location)
 - I am searching for some [Middle Eastern](cuisine) food near [kanjur marg](location)
 - I am searching for some [Mediterranean](cuisine) food near [khar road](location)
@@ -370,8 +373,16 @@
 - show me some [south indian](cuisine) restaurants [nearby](user_location)
 - show me some [italian](cuisine) restaurants [near by](user_location)
 - show me some restaurants near [lucknow](location)
+- show me some restaurants near [berlin](location)
 - show me some [maharashtrian](cuisine) restaurants
 - show me [chinese](cuisine) restaurants near [kalyan](location)
+
+## intent:show_more
+- show more restaurants
+- show more 
+- show some more restaurants
+- next restaurants
+- more restaurants
 
 ## lookup:cuisine
 data/cuisines.txt   

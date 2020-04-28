@@ -53,7 +53,8 @@ def getLocationDetails(entity_id,entity_type):
 
     for cuisine in top_cuisines:
         item={}
-        item["title"]=cuisine
+        item["title"] = cuisine
+        item["payload"] = cuisine
         cuisines.append(item)
 
     best_restaurants=[]
@@ -75,8 +76,10 @@ def getLocationDetails(entity_id,entity_type):
         item["ratings"]=data["best_rated_restaurant"][i]["restaurant"]["user_rating"]["aggregate_rating"]
         item["rating_color"]=data["best_rated_restaurant"][i]["restaurant"]["user_rating"]["rating_color"]
         item["price_range"]=data["best_rated_restaurant"][i]["restaurant"]["price_range"]
+        item["currency"]=data["best_rated_restaurant"][i]["restaurant"]["currency"]
         item["cost"]=data["best_rated_restaurant"][i]["restaurant"]["average_cost_for_two"]
         item["location"]=data["best_rated_restaurant"][i]["restaurant"]["location"]["locality_verbose"]
+        item["user_rating_text"]=data["best_rated_restaurant"][i]["restaurant"]["user_rating"]["rating_text"]
 
         if "photos" in data["best_rated_restaurant"][i]["restaurant"].keys():
             if(len(data["best_rated_restaurant"][i]["restaurant"]["photos"])<5):
@@ -98,7 +101,7 @@ def getCuisineId(cuisine_name,city_id):
     url = 'https://developers.zomato.com/api/v2.1/cuisines'
     data = requests.post(url, headers=headers, params=data)
     data = json.loads(data.text)
-    print("data: ",data)
+    # print("data: ",data)
     cuisines=data["cuisines"]
     cuisineID=None
     for cuisine in cuisines:
@@ -133,6 +136,8 @@ def searchRestaurants(entity_id,entity_type, cuisine_id,search_query):
         item["price_range"]=data["restaurants"][i]["restaurant"]["price_range"]
         item["cost"]=data["restaurants"][i]["restaurant"]["average_cost_for_two"]
         item["location"]=data["restaurants"][i]["restaurant"]["location"]["locality_verbose"]
+        item["currency"]=data["restaurants"][i]["restaurant"]["currency"]
+        item["user_rating_text"]=data["restaurants"][i]["restaurant"]["user_rating"]["rating_text"]
 
         if "photos" in data["restaurants"][i]["restaurant"].keys():
             if(len(data["restaurants"][i]["restaurant"]["photos"])<5):

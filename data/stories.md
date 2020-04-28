@@ -308,3 +308,24 @@
     - action_ask_cuisine
 * inform{"user_location":"deny"}
     - utter_location_denied
+
+## story_14 show more restaurants
+* searchRestaurant{"cuisine":"chinese","location":"berlin"}
+    - action_search_restaurants
+* show_more
+    - action_show_more_results
+
+## story_15 show more restaurants
+* searchRestaurant
+    - utter_ask_location
+* inform{"location":"hinjewadi"}
+    - slot{"location":"hinjewadi"}
+    - action_ask_cuisine
+    - slot{"city_id":5}
+    - slot{"location_id":3305}
+    - slot{"location_type":"subzone"}
+* inform{"cuisine":"chinese"}
+    - slot{"cuisine":"chinese"}
+    - action_search_restaurants
+* show_more
+    - action_show_more_results

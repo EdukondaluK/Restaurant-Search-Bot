@@ -12,6 +12,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet,UserUtteranceReverted
 import zomatoApi
+import json
 
 class ActionGreetUser(Action):
     """
@@ -23,8 +24,34 @@ class ActionGreetUser(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        dispatcher.utter_template("utter_greet_user", tracker)        
+
+        dispatcher.utter_message(template="utter_greet_user")   
         return [UserUtteranceReverted()] 
+
+class ActionShowMoreRestaurants(Action):
+    """
+    Show more results of the restaurants
+    """
+    def name(self) -> Text:
+        return "action_show_more_results"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        restaurants = tracker.get_slot("more_restaurants")
+        if restaurants!=None:
+            if(tracker.get_latest_input_channel()=="slack"):
+                restData = getResto_Slack(restaurants,show_more_results=False)
+                dispatcher.utter_message(text="Here are few more restaurants",json_message=restData)
+            else:
+                dispatcher.utter_message(text="Here are few more restaurants",json_message={"payload":"cardsCarousel","data":restaurants})
+            
+            return [SlotSet("more_restaurants", None)] 
+        else:
+            dispatcher.utter_message(text="Sorry No more restaurants found")
+            return []
+        
 
 class ActionSearchRestaurants(Action):
     """
@@ -110,12 +137,28 @@ class ActionSearchRestaurants(Action):
 
             ## check if restaurants found
             if(len(restaurants)>0):
-                dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants})
-                
-                return []
-                
-            dispatcher.utter_message("Sorry we couldn't find any restaurants that serves {} cuisine in {} 😞".format(cuisine,location))
-            return [UserUtteranceReverted()] 
+
+                if(tracker.get_latest_input_channel()=="slack"):
+                    more_restaurants=[]
+                    if(len(restaurants)>5):
+                        restData=getResto_Slack(restaurants[:5],show_more_results=True)
+                        more_restaurants=restaurants[5:]
+                    else:
+                        restData=getResto_Slack(restaurants,show_more_results=False)
+
+                    dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message=restData)
+                    return [SlotSet("more_restaurants", more_restaurants)]    
+                else:
+                    if(len(restaurants)>5):   
+                        dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants[:5]})
+                        return [SlotSet("more_restaurants", restaurants[5:])]
+                    else:
+                        dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants})
+                        return [SlotSet("more_restaurants", None)]    
+            
+            else:    
+                dispatcher.utter_message("Sorry we couldn't find any restaurants that serves {} cuisine in {} 😞".format(cuisine,location))
+                return [UserUtteranceReverted()] 
             
            
 class ActionSearchBestRestaurants(Action):
@@ -186,15 +229,30 @@ class ActionSearchBestRestaurants(Action):
         
         ## search the best restaurts by calling zomatoApi api
         restaurants=zomatoApi.getLocationDetails(entity_id,entity_type)
+
         
-        ## check if restaurants details found
         if(len(restaurants)>0):
-                dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message={"payload":"cardsCarousel","data":restaurants["best_restaurants"]})
-               
-                return []
-        
-        dispatcher.utter_message("Sorry we couldn't find any best restaurants ☹️")
-        return [UserUtteranceReverted()]
+            if(tracker.get_latest_input_channel()=="slack"):
+                more_restaurants=None
+                if len(restaurants["best_restaurants"])>5:
+                    restData=getResto_Slack(restaurants["best_restaurants"][:5],show_more_results=True)
+                    more_restaurants=restaurants["best_restaurants"][5:]
+                    dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message=restData)
+                else:
+                    restData=getResto_Slack(restaurants["best_restaurants"],show_more_results=False)
+
+                    dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message=restData)
+                return [SlotSet("more_restaurants", more_restaurants)]    
+            else:
+                if len(restaurants["best_restaurants"])>5:
+                    dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message={"payload":"cardsCarousel","data":restaurants["best_restaurants"][:5]})
+                    return [SlotSet("more_restaurants", restaurants["best_restaurants"][5:])]    
+                else:
+                    dispatcher.utter_message(text="Here are few top rated restaurants that I have found 🤩",json_message={"payload":"cardsCarousel","data":restaurants["best_restaurants"]})
+                    return [SlotSet("more_restaurants", None)]    
+        else:    
+            dispatcher.utter_message("Sorry we couldn't find any restaurants that serves {} cuisine in {} 😞".format(cuisine,location))
+            return [UserUtteranceReverted()] 
         
 
 class ActionSearchRestaurantsWithoutCuisine(Action):
@@ -227,8 +285,31 @@ class ActionSearchRestaurantsWithoutCuisine(Action):
         ##set the cuisine to any of the cuisine name or you leave it empyt
         cuisine_id=""
         restaurants=zomatoApi.searchRestaurants(entity_id,entity_type, cuisine_id,"")
-        dispatcher.utter_message(text="Here are the few restaurants I have found 😋!!!",json_message={"payload":"cardsCarousel","data":restaurants})
         
+        ## check if restaurants found
+        if(len(restaurants)>0):
+
+            if(tracker.get_latest_input_channel()=="slack"):
+                more_restaurants=[]
+                if(len(restaurants)>5):
+                    restData=getResto_Slack(restaurants[:5],show_more_results=True)
+                    more_restaurants=restaurants[5:]
+                else:
+                    restData=getResto_Slack(restaurants,show_more_results=False)
+
+                dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message=restData)
+                return [SlotSet("more_restaurants", more_restaurants)]    
+            else:
+                if(len(restaurants)>5):   
+                    dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants[:5]})
+                    return [SlotSet("more_restaurants", restaurants[5:])]
+                else:
+                    dispatcher.utter_message(text="Here are the few restaurants that matches your preferences 😋",json_message={"payload":"cardsCarousel","data":restaurants})
+                    return [SlotSet("more_restaurants", None)]    
+        
+        else:    
+            dispatcher.utter_message("Sorry we couldn't find any restaurants that serves {} cuisine in {} 😞".format(cuisine,location))
+            return [UserUtteranceReverted()] 
 
 class ActionAskCuisine(Action):
     """
@@ -245,6 +326,9 @@ class ActionAskCuisine(Action):
         print()
         print("====Inside ActionAskCuisine====")
         print()
+        # print("tracker: ",)
+        channel=tracker.get_latest_input_channel()
+
         location=tracker.get_slot("location")
         cuisine=tracker.get_slot("cuisine")
         lat=tracker.get_slot("latitude")
@@ -293,10 +377,10 @@ class ActionAskCuisine(Action):
             entity_type=locationEntities["entity_type"]
             city_id=locationEntities["city_id"]
             SlotSet("location", locationEntities["title"])
-
+            print("locationDetails: ",locationEntities)
+            print()
         
-        print("locationDetails: ",locationEntities)
-        print()
+     
 
         ## check if the restaurants are available in the user provided location
         if(locationEntities["restaurants_available"]=="no"):
@@ -305,10 +389,57 @@ class ActionAskCuisine(Action):
 
         else:
             locationDetails=zomatoApi.getLocationDetails(locationEntities["entity_id"],locationEntities["entity_type"])
-
-            dispatcher.utter_template("utter_ask_cuisine", tracker)
-            dispatcher.utter_message(json_message={"payload":"quickReplies","data":locationDetails["top_cuisines"]})
+            if channel=="slack":
+                dispatcher.utter_message(template="utter_ask_cuisine",buttons=locationDetails["top_cuisines"])
+            else:
+                dispatcher.utter_message(template="utter_ask_cuisine",json_message={"payload":"quickReplies","data":locationDetails["top_cuisines"]})
         
             return [SlotSet("city_id", locationEntities["city_id"]),SlotSet("location_id", locationEntities["entity_id"]),SlotSet("location_type", locationEntities["entity_type"])]
 
+
+
+def getResto_Slack(resto,show_more_results):        
+    """
+    prepares the restaurants details in the template format that slack requires.
+    MOre details here: https://api.slack.com/tools/block-kit-builder?mode=message&blocks=%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22We%20found%20*205%20Hotels*%20in%20New%20Orleans%2C%20LA%20from%20*12%2F14%20to%2012%2F17*%22%7D%2C%22accessory%22%3A%7B%22type%22%3A%22overflow%22%2C%22options%22%3A%5B%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Option%20One%22%7D%2C%22value%22%3A%22value-0%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Option%20Two%22%7D%2C%22value%22%3A%22value-1%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Option%20Three%22%7D%2C%22value%22%3A%22value-2%22%7D%2C%7B%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Option%20Four%22%7D%2C%22value%22%3A%22value-3%22%7D%5D%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*%3CfakeLink.toHotelPage.com%7CWindsor%20Court%20Hotel%3E*%5Cn%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85%5Cn%24340%20per%20night%5CnRated%3A%209.4%20-%20Excellent%22%7D%2C%22accessory%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgent_1.png%22%2C%22alt_text%22%3A%22Windsor%20Court%20Hotel%20thumbnail%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgentLocationMarker.png%22%2C%22alt_text%22%3A%22Location%20Pin%20Icon%22%7D%2C%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Location%3A%20Central%20Business%20District%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*%3CfakeLink.toHotelPage.com%7CThe%20Ritz-Carlton%20New%20Orleans%3E*%5Cn%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85%5Cn%24340%20per%20night%5CnRated%3A%209.1%20-%20Excellent%22%7D%2C%22accessory%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgent_2.png%22%2C%22alt_text%22%3A%22Ritz-Carlton%20New%20Orleans%20thumbnail%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgentLocationMarker.png%22%2C%22alt_text%22%3A%22Location%20Pin%20Icon%22%7D%2C%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Location%3A%20French%20Quarter%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*%3CfakeLink.toHotelPage.com%7COmni%20Royal%20Orleans%20Hotel%3E*%5Cn%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85%5Cn%24419%20per%20night%5CnRated%3A%208.8%20-%20Excellent%22%7D%2C%22accessory%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgent_3.png%22%2C%22alt_text%22%3A%22Omni%20Royal%20Orleans%20Hotel%20thumbnail%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fapi.slack.com%2Fimg%2Fblocks%2Fbkb_template_images%2FtripAgentLocationMarker.png%22%2C%22alt_text%22%3A%22Location%20Pin%20Icon%22%7D%2C%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Location%3A%20French%20Quarter%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Next%202%20Results%22%7D%2C%22value%22%3A%22click_me_123%22%7D%5D%7D%5D
+
+    """
+
+    print("Show more: ",show_more_results)
+    print(len(resto))
+    blocks=[]
+    divider={ "type": "divider" }
+
+    blocks.append(divider)
+    for i in range(0,len(resto)):
+        resto_name=resto[i]["name"]
+        url=resto[i]["url"]
+        price=resto[i]["cost"]
+        ratings=int(float(resto[i]["ratings"]))
+        votes=resto[i]["votes"]
+        timings=resto[i]["timings"]
+        image=resto[i]["image"]
+        location=resto[i]["location"]
+        currency=resto[i]["currency"]
+        title="<"+url+"|"+resto_name+">"
+        image_url=image.replace("?output-format=webp","")
         
+        stars=""
+        for j in range(ratings):
+            stars = stars + "★"
+        text="*"+title+"*\n"+stars+"\n"+currency+str(price)+"\nRated: "+resto[i]["ratings"]+" - "+resto[i]["user_rating_text"]+"\t:+1:"+votes
+
+        temp={ "type": "section", "text": { "type": "mrkdwn", "text": text}, "accessory": { "type": "image", "image_url": image_url, "alt_text": resto_name } }
+        location_detail={ "type": "context", "elements": [{ "type": "image", "image_url": "https://api.slack.com/img/blocks/bkb_template_images/tripAgentLocationMarker.png", "alt_text": "Location Pin Icon" }, { "type": "plain_text", "text": location } ] }
+        
+        
+        blocks.append(temp)
+        blocks.append(location_detail)
+        blocks.append(divider)
+
+    if show_more_results==True:
+        show_more={ "type": "actions", "elements": [ { "type": "button", "text": { "type": "plain_text", "text": "Show More" }, "value": "/show_more" } ] }
+        blocks.append(show_more)
+
+    
+    return ({ "blocks": blocks })
